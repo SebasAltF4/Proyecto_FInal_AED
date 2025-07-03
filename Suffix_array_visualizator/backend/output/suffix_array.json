@@ -1,0 +1,30 @@
+[
+  {
+    "rank": 0,
+    "index": 3,
+    "original_char": "a",
+    "length": 1,
+    "suffix": "a"
+  },
+  {
+    "rank": 1,
+    "index": 0,
+    "original_char": "h",
+    "length": 4,
+    "suffix": "hola"
+  },
+  {
+    "rank": 2,
+    "index": 2,
+    "original_char": "l",
+    "length": 2,
+    "suffix": "la"
+  },
+  {
+    "rank": 3,
+    "index": 1,
+    "original_char": "o",
+    "length": 3,
+    "suffix": "ola"
+  }
+]

@@ -5,7 +5,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #11998e, #38ef7d); /* Verde azulado y verde lima */
+  background: linear-gradient(135deg, #11998e, #38ef7d);
   color: #1a1a1a;
   margin: 0;
   padding: 20px;
@@ -18,7 +18,7 @@ body {
 .container {
   max-width: 900px;
   width: 100%;
-  background: #f0fdf9; /* Fondo blanco con tinte verdoso */
+  background: #f0fdf9;
   border-radius: 15px;
   padding: 30px;
   box-shadow: 0 10px 30px rgba(20, 60, 50, 0.25);
@@ -34,6 +34,26 @@ h1 {
   text-shadow: 1px 1px 2px #a1d6b7;
 }
 
+.input-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#textInput {
+  font-size: 1.1rem;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 2px solid #38ef7d;
+  width: 250px;
+  margin-right: 10px;
+  transition: border-color 0.3s ease;
+}
+
+#textInput:focus {
+  outline: none;
+  border-color: #2dbd63;
+}
+
 .btn-upload {
   background-color: #38ef7d;
   border: none;
@@ -43,8 +63,6 @@ h1 {
   padding: 14px 25px;
   border-radius: 8px;
   cursor: pointer;
-  display: block;
-  margin: 0 auto 30px auto;
   box-shadow: 0 4px 10px rgba(56, 239, 125, 0.7);
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -57,14 +75,14 @@ h1 {
 table {
   width: 100%;
   border-collapse: collapse;
-  background: #e0f7f3; /* Fondo celeste claro */
+  background: #e0f7f3;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 6px 18px rgba(0, 80, 70, 0.25);
 }
 
 thead {
-  background: #2dbd63; /* Verde fuerte */
+  background: #2dbd63;
   color: #f0fdf9;
   font-weight: 700;
   font-size: 1.1rem;
@@ -93,6 +111,38 @@ tbody td {
   user-select: text;
 }
 
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  user-select: none;
+}
+
+.pagination-controls button {
+  background-color: #38ef7d;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: #0b3c2d;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(56, 239, 125, 0.7);
+  transition: background-color 0.3s ease;
+}
+
+.pagination-controls button:disabled {
+  background-color: #a5d9b5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #2dbd63;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   h1 {
@@ -105,5 +155,14 @@ tbody td {
   tbody td, thead th {
     font-size: 0.85rem;
     padding: 10px 6px;
+  }
+  #textInput {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 }

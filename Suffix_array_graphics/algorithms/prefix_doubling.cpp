@@ -5,16 +5,30 @@
 #include <chrono>
 #include <fstream>
 #include <random>
+#include <cstdlib>
 
 #ifdef _WIN32
 #include <windows.h>
 #include <psapi.h>
-#pragma comment(lib, "psapi.lib")
+#include <direct.h>
+#include <sys/stat.h>
 #endif
 
 using namespace std;
 
-// Genera un string aleatorio
+// Crea la carpeta ./data si no existe
+void createDataFolder() {
+#ifdef _WIN32
+    struct _stat info;
+    if (_stat("data", &info) != 0) {
+        _mkdir("data");
+    }
+#else
+    mkdir("data", 0777);
+#endif
+}
+
+// Genera un string aleatorio de longitud 'length'
 string generate_random_string(int length) {
     const string charset = "abcdefghijklmnopqrstuvwxyz";
     random_device rd;
@@ -28,18 +42,18 @@ string generate_random_string(int length) {
     return result;
 }
 
-// Medir el uso máximo de memoria (en KB)
+// Devuelve el uso pico de memoria (en KB)
 size_t getPeakMemoryUsageKB() {
 #ifdef _WIN32
     PROCESS_MEMORY_COUNTERS pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
     return pmc.PeakWorkingSetSize / 1024;
 #else
-    return 0; // Opcional: añadir implementación para Unix
+    return 0;
 #endif
 }
 
-// Algoritmo Prefix Doubling
+// Algoritmo de construcción del suffix array usando Prefix Doubling
 vector<int> build_suffix_array_prefix_doubling(const string& s) {
     int n = s.size();
     vector<int> sa(n), rank(n), temp(n);
@@ -68,13 +82,23 @@ vector<int> build_suffix_array_prefix_doubling(const string& s) {
 }
 
 int main() {
-    vector<int> sizes = {1000, 5000, 10000, 50000, 100000, 250000, 500000};
+    createDataFolder();
 
-    ofstream csv("resultados_prefix_doubling.csv");
-    csv << "Tamaño,Tiempo(s),Memoria Pico (KB)" << endl;
+    ofstream csv("data/resultados_prefix_doubling.csv");
+    if (!csv.is_open()) {
+        cerr << "Error al abrir el archivo CSV.\n";
+        return 1;
+    }
+    csv << "Tamaño,Tiempo(s),Memoria Pico (KB)\n";
+
+    vector<int> sizes = {
+        1000, 10000, 30000, 60000, 100000, 
+        200000, 400000, 600000, 800000, 
+        1000000, 1250000, 1500000, 2000000
+    };
+
 
     for (int size : sizes) {
-        cout << "\nGenerando string de tamaño " << size << "..." << endl;
         string input = generate_random_string(size);
 
         auto start = chrono::high_resolution_clock::now();
@@ -84,13 +108,18 @@ int main() {
         chrono::duration<double> duration = end - start;
         size_t peak_memory = getPeakMemoryUsageKB();
 
-        cout << "Tamaño: " << size << ", Tiempo: " << duration.count()
+        cout << "Tamaño: " << size
+             << ", Tiempo: " << duration.count()
              << " s, Memoria pico: " << peak_memory << " KB" << endl;
 
-        csv << size << "," << duration.count() << "," << peak_memory << endl;
+        csv << size << "," << duration.count() << "," << peak_memory << "\n";
     }
 
     csv.close();
-    cout << "\nResultados guardados en 'resultados_prefix_doubling.csv'" << endl;
+    cout << "CSV guardado exitosamente en ./data/resultados_prefix_doubling.csv\n";
     return 0;
 }
+
+
+//g++ -std=c++17 algorithms/prefix_doubling.cpp -o algorithms/prefix_doubling.exe -lpsapi
+//.\algorithms\prefix_doubling.exe

@@ -1,15 +1,12 @@
 #include <iostream>
-#include <fstream>
 #include <vector>
 #include <string>
 #include <algorithm>
 
 using namespace std;
 
-// Tipos de sufijo
 enum SuffixType { S_TYPE, L_TYPE };
 
-// Comparar sufijos LMS (Leftmost S-Type)
 bool isLMS(int i, const vector<SuffixType>& t) {
     return i > 0 && t[i] == S_TYPE && t[i - 1] == L_TYPE;
 }
@@ -29,14 +26,12 @@ void induced_sort(const string& s, vector<int>& sa, const vector<SuffixType>& t,
 
     fill(sa.begin(), sa.end(), -1);
 
-    // Colocar sufijos LMS al final de cada bucket
     for (int i = n - 1; i >= 0; --i) {
         if (isLMS(i, t)) {
             sa[--bucket_ends[(int)s[i]]] = i;
         }
     }
 
-    // Inducir L-Type
     for (int i = 0; i < n; ++i) {
         int j = sa[i] - 1;
         if (j >= 0 && t[j] == L_TYPE) {
@@ -44,7 +39,6 @@ void induced_sort(const string& s, vector<int>& sa, const vector<SuffixType>& t,
         }
     }
 
-    // Inducir S-Type
     for (int i = n - 1; i >= 0; --i) {
         int j = sa[i] - 1;
         if (j >= 0 && t[j] == S_TYPE) {
@@ -54,12 +48,11 @@ void induced_sort(const string& s, vector<int>& sa, const vector<SuffixType>& t,
 }
 
 vector<int> build_suffix_array_sa_is(const string& s_input) {
-    string s = s_input + '\0'; // Añadir terminador nulo
+    string s = s_input + '\0';
     int n = s.size();
     vector<int> sa(n, -1);
     vector<SuffixType> t(n);
 
-    // Paso 1: determinar tipo de cada posición
     t[n - 1] = S_TYPE;
     for (int i = n - 2; i >= 0; --i) {
         if (s[i] < s[i + 1]) t[i] = S_TYPE;
@@ -67,41 +60,37 @@ vector<int> build_suffix_array_sa_is(const string& s_input) {
         else t[i] = t[i + 1];
     }
 
-    // Paso 2: contar frecuencia de caracteres
     vector<int> bucket_sizes(256, 0);
     for (char c : s) bucket_sizes[(int)c]++;
 
-    // Paso 3: ordenar LMS y luego inducir sufijos
     induced_sort(s, sa, t, bucket_sizes);
 
-    // Retornar SA sin el terminador '\0'
     return vector<int>(sa.begin() + 1, sa.end());
 }
 
-int main() {
-    string input;
-    cout << "Ingrese el texto: ";
-    cin >> input;
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        cerr << "Debes ingresar la palabra como argumento." << endl;
+        return 1;
+    }
 
+    string input = argv[1];
     vector<int> suffix_array = build_suffix_array_sa_is(input);
 
-    ofstream file("suffix_array.json");
-    file << "[\n";
+    cout << "[\n";
     for (size_t i = 0; i < suffix_array.size(); ++i) {
         int idx = suffix_array[i];
-        file << "  {\n";
-        file << "    \"rank\": " << i << ",\n";
-        file << "    \"index\": " << idx << ",\n";
-        file << "    \"original_char\": \"" << input[idx] << "\",\n";
-        file << "    \"length\": " << input.size() - idx << ",\n";
-        file << "    \"suffix\": \"" << input.substr(idx) << "\"\n";
-        file << "  }";
-        if (i != suffix_array.size() - 1) file << ",";
-        file << "\n";
+        cout << "  {\n";
+        cout << "    \"rank\": " << i << ",\n";
+        cout << "    \"index\": " << idx << ",\n";
+        cout << "    \"original_char\": \"" << input[idx] << "\",\n";
+        cout << "    \"length\": " << input.size() - idx << ",\n";
+        cout << "    \"suffix\": \"" << input.substr(idx) << "\"\n";
+        cout << "  }";
+        if (i != suffix_array.size() - 1) cout << ",";
+        cout << "\n";
     }
-    file << "]\n";
-    file.close();
+    cout << "]\n";
 
-    cout << "Suffix Array generado con SA-IS en 'suffix_array.json'" << endl;
     return 0;
 }

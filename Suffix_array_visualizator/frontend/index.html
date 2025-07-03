@@ -3,37 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Visualizador de Suffix Array</title>
+  <title>Visualizador de Suffix Array 🚀</title>
   <!-- Fuente moderna desde Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/frontend/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Visualizador de Suffix Array</h1>
+    <h1>Visualizador de Suffix Array 🚀</h1>
 
-    <label for="fileInput" class="btn-upload" tabindex="0">
-        
-      📂 Seleccionar archivo JSON
-      <input type="file" id="fileInput" accept=".json" />
-    </label>
+    <!-- Input de texto y botón -->
+    <div class="input-section">
+      <input type="text" id="textInput" placeholder="Escribe una palabra..." />
+      <button id="generateBtn" class="btn-upload">Generar 🔍</button>
+    </div>
 
     <div class="table-wrapper">
       <table id="suffixTable" aria-label="Tabla de Suffix Array">
         <thead>
           <tr>
-            <th scope="col">Rank</th>
-            <th scope="col">Index</th>
-            <th scope="col">Original Char</th>
-            <th scope="col">Length</th>
-            <th scope="col">Suffix</th>
+            <th scope="col">Rank #️⃣</th>
+            <th scope="col">Index 🔢</th>
+            <th scope="col">Original Char 🔤</th>
+            <th scope="col">Length 📏</th>
+            <th scope="col">Suffix 🧩</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
+
+    <div class="pagination-controls">
+      <button id="prevBtn" disabled>⬅️ Anterior</button>
+      <span id="pageInfo">Página 1</span>
+      <button id="nextBtn" disabled>Siguiente ➡️</button>
+    </div>
   </div>
 
-  <script src="/frontend/script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
