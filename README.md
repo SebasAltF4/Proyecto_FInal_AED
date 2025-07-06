@@ -62,7 +62,9 @@ g++ -std=c++17 algorithms/sais.cpp -o sais.exe -lpsapi
 
 > **Nota:** El flag `-lpsapi` es necesario en Windows para medir el uso de memoria.
 
-### Visualización web
+---
+
+## Visualización web
 
 Para probar la visualización interactiva, abre el archivo `Suffix_array_visualizator/frontend/index.html` en tu navegador favorito e ingresa cualquier palabra para ver cómo se arma y ordena el arreglo de sufijos paso a paso.
 
@@ -71,5 +73,5 @@ Para probar la visualización interactiva, abre el archivo `Suffix_array_visuali
 **Requisitos:**
 - Compilador C++ compatible con C++17
 - Python 3 (para ejecutar scripts de gráficos, si aplica)
-- Navegador web moderno
+- Navegador web (Chrome, Brave, Edge, etc)
 
