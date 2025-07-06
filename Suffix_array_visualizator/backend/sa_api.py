@@ -14,7 +14,7 @@ def generate_suffix_array():
         data = request.get_json()
         print("Data recibida:", data)
         if not data or 'text' not in data:
-            return jsonify({'error': 'No se recibió texto'}), 400
+            return jsonify({'error': 'No se recibio texto'}), 400
 
         text = data['text']
         print("Texto recibido:", text)
@@ -32,7 +32,7 @@ def generate_suffix_array():
         print("Subprocess stderr:", result.stderr)
 
         if result.returncode != 0:
-            return jsonify({'error': 'Error en ejecución del programa', 'details': result.stderr}), 500
+            return jsonify({'error': 'Error en ejecucion del programa', 'details': result.stderr}), 500
 
         # Intentar parsear el JSON que devuelve el programa C++
         suffix_array_json = json.loads(result.stdout)
