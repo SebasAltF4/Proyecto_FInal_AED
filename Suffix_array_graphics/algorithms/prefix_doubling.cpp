@@ -108,7 +108,7 @@ int main() {
         chrono::duration<double> duration = end - start;
         size_t peak_memory = getPeakMemoryUsageKB();
 
-        cout << "Tamaño: " << size
+        cout << "Tamanho: " << size
              << ", Tiempo: " << duration.count()
              << " s, Memoria pico: " << peak_memory << " KB" << endl;
 
