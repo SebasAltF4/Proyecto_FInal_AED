@@ -62,6 +62,7 @@ g++ -std=c++17 algorithms/sais.cpp -o sais.exe -lpsapi
 
 > **Nota:** El flag `-lpsapi` es necesario en Windows para medir el uso de memoria.
 
+```
 ---
 
 ## Visualización web
