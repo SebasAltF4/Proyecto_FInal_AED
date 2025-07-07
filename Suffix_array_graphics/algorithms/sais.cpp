@@ -15,17 +15,15 @@
 #include <sys/stat.h>
 #endif
 
-using namespace std;
-
-// === Funciones de sistema ===
+// Funciones de sistema
 void createDataFolder() {
 #ifdef _WIN32
     struct _stat info;
     if (_stat("data", &info) != 0) {
-        _mkdir("data");
+        _mkdir("data"); // Crear carpeta "data" si no existe
     }
 #else
-    mkdir("data", 0777);
+    mkdir("data", 0777); // Crear carpeta "data" en sistemas Unix-like
 #endif
 }
 
@@ -33,38 +31,38 @@ size_t getPeakMemoryUsageKB() {
 #ifdef _WIN32
     PROCESS_MEMORY_COUNTERS pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
-    return pmc.PeakWorkingSetSize / 1024;
+    return pmc.PeakWorkingSetSize / 1024; // Retorna memoria pico en KB
 #else
-    return 0;
+    return 0; // No se implementa en otros sistemas
 #endif
 }
 
-// === String aleatorio ===
-string generate_random_string(int length) {
-    const string charset = "abcdefghijklmnopqrstuvwxyz";
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dis(0, charset.size() - 1);
+// Función para generar una cadena aleatoria
+std::string generate_random_string(int length) {
+    const std::string charset = "abcdefghijklmnopqrstuvwxyz";
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, charset.size() - 1);
 
-    string result;
-    result.reserve(length);
-    for (int i = 0; i < length; ++i)
-        result += charset[dis(gen)];
+    std::string result(length, '\0');  // Reservar espacio de antemano para evitar múltiples realocaciones
+    for (int i = 0; i < length; ++i) {
+        result[i] = charset[dis(gen)];
+    }
     return result;
 }
 
-// === SA-IS optimizado ===
-void getBuckets(const vector<int>& s, vector<int>& bucket, int sigma, bool end) {
-    fill(bucket.begin(), bucket.end(), 0);
+// SA-IS optimizado
+void getBuckets(const std::vector<int>& s, std::vector<int>& bucket, int sigma, bool end) {
+    std::fill(bucket.begin(), bucket.end(), 0); // Limpiar el bucket
     for (int c : s) bucket[c]++;
     int sum = 0;
     for (int i = 0; i < sigma; ++i) {
         sum += bucket[i];
-        bucket[i] = end ? sum : (sum - bucket[i]);
+        bucket[i] = end ? sum : (sum - bucket[i]); // Calcular los buckets
     }
 }
 
-void induceSAl(const vector<int>& s, vector<int>& sa, vector<int>& bucket, int sigma, const vector<bool>& t) {
+void induceSAl(const std::vector<int>& s, std::vector<int>& sa, std::vector<int>& bucket, int sigma, const std::vector<bool>& t) {
     getBuckets(s, bucket, sigma, false);
     for (int i = 0; i < sa.size(); ++i) {
         int j = sa[i] - 1;
@@ -73,7 +71,7 @@ void induceSAl(const vector<int>& s, vector<int>& sa, vector<int>& bucket, int s
     }
 }
 
-void induceSAs(const vector<int>& s, vector<int>& sa, vector<int>& bucket, int sigma, const vector<bool>& t) {
+void induceSAs(const std::vector<int>& s, std::vector<int>& sa, std::vector<int>& bucket, int sigma, const std::vector<bool>& t) {
     getBuckets(s, bucket, sigma, true);
     for (int i = sa.size() - 1; i >= 0; --i) {
         int j = sa[i] - 1;
@@ -82,81 +80,80 @@ void induceSAs(const vector<int>& s, vector<int>& sa, vector<int>& bucket, int s
     }
 }
 
-vector<int> sais(const string& str, int sigma = 256) {
+// Implementación de SA-IS
+std::vector<int> sais(const std::string& str, int sigma = 256) {
     int n = str.size();
-    if (n == 0) return {};
+    if (n == 0) return {}; // Si la cadena está vacía, retornar
 
-    vector<int> s(n + 1);
-    for (int i = 0; i < n; ++i)
-        s[i] = (unsigned char)str[i];
-    s[n] = 0; // sentinel
+    std::vector<int> s(n + 1);
+    for (int i = 0; i < n; ++i) {
+        s[i] = static_cast<unsigned char>(str[i]); // Convertir cada carácter a valor entero
+    }
+    s[n] = 0; // Agregar un sentinel
 
     int m = s.size();
-    vector<int> sa(m, -1);
-    vector<bool> t(m);
-    t[m - 1] = true;
+    std::vector<int> sa(m, -1);
+    std::vector<bool> t(m);
+    t[m - 1] = true; // El último carácter es siempre S-type
     for (int i = m - 2; i >= 0; --i)
-        t[i] = (s[i] < s[i + 1]) || (s[i] == s[i + 1] && t[i + 1]);
+        t[i] = (s[i] < s[i + 1]) || (s[i] == s[i + 1] && t[i + 1]); // Determinar los tipos de caracteres
 
-    vector<int> bucket(sigma, 0);
-    getBuckets(s, bucket, sigma, true);
+    std::vector<int> bucket(sigma, 0);
+    getBuckets(s, bucket, sigma, true); // Llenar los buckets
     for (int i = 0; i < m; ++i)
-        sa[i] = -1;
+        sa[i] = -1; // Inicializar SA
 
-    // Colocar LMS
+    // Colocar los sufijos LMS (Leftmost S-type)
     for (int i = 1; i < m; ++i)
         if (!t[i - 1] && t[i])
             sa[--bucket[s[i]]] = i;
 
-    induceSAl(s, sa, bucket, sigma, t);
-    induceSAs(s, sa, bucket, sigma, t);
+    induceSAl(s, sa, bucket, sigma, t); // Inducir L-type
+    induceSAs(s, sa, bucket, sigma, t); // Inducir S-type
 
-    return vector<int>(sa.begin() + 1, sa.end());  // quitar sentinel
+    return std::vector<int>(sa.begin() + 1, sa.end()); // Eliminar el sentinel
 }
 
-// === Programa principal ===
+// Función principal
 int main() {
-    createDataFolder();
+    createDataFolder(); // Crear la carpeta de datos
 
-    ofstream csv("data/resultados_sais.csv");
+    std::ofstream csv("data/resultados_sais.csv");
     if (!csv.is_open()) {
-        cerr << "Error al abrir el archivo CSV.\n";
+        std::cerr << "Error al abrir el archivo CSV.\n";
         return 1;
     }
     csv << "Tamaño,Tiempo(s),Memoria Pico (KB)\n";
 
-    vector<int> sizes = {
-        1000, 10000, 30000, 60000, 100000, 
-        200000, 400000, 600000, 800000, 
+    // Tamaños de cadenas para probar
+    std::vector<int> sizes = {
+        1000, 10000, 30000, 60000, 100000,
+        200000, 400000, 600000, 800000,
         1000000, 1250000, 1500000, 2000000
     };
 
     for (int size : sizes) {
         if (size == 0) {
             csv << "0,0,0\n";
-            cout << "Tamaño: 0, Tiempo: 0 s, Memoria pico: 0 KB\n";
+            std::cout << "Tamaño: 0, Tiempo: 0 s, Memoria pico: 0 KB\n";
             continue;
         }
 
-        string input = generate_random_string(size);
-        cout << "Procesando tamaño: " << size << "...";
+        std::string input = generate_random_string(size); // Generar cadena aleatoria
+        std::cout << "Procesando tamaño: " << size << "...";
 
-        auto start = chrono::high_resolution_clock::now();
-        vector<int> sa = sais(input);
-        auto end = chrono::high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
+        std::vector<int> sa = sais(input); // Ejecutar SA-IS
+        auto end = std::chrono::high_resolution_clock::now();
 
-        chrono::duration<double> duration = end - start;
-        size_t peak_memory = getPeakMemoryUsageKB();
+        std::chrono::duration<double> duration = end - start;
+        size_t peak_memory = getPeakMemoryUsageKB(); // Obtener memoria pico
 
-        cout << " Listo. Tiempo: " << duration.count() << " s, Memoria: " << peak_memory << " KB\n";
+        std::cout << " Listo. Tiempo: " << duration.count() << " s, Memoria: " << peak_memory << " KB\n";
         csv << size << "," << duration.count() << "," << peak_memory << "\n";
     }
 
-    csv.close();
-    cout << "CSV guardado exitosamente en ./data/resultados_sais.csv\n";
+    csv.close(); // Cerrar archivo CSV
+    std::cout << "CSV guardado exitosamente en ./data/resultados_sais.csv\n";
     return 0;
 }
-
-
-//g++ -std=c++17 algorithms/sais.cpp -o algorithms/sais.exe -lpsapi
-//.\algorithms\sais.exe
